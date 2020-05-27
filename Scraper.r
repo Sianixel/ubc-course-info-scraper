@@ -211,6 +211,7 @@ clean_information <- function(courseinfo){
 
     cleaned_table <- filter(courseinfo, !grepl('Instructor', Instructor)) %>%
         separate(Instructor, c("Trim", "Instructor"), sep = ": ") %>%
+        separate(Section, c("Course Code", "Course Number", "Section"), sep = " ") %>%
         select(Section, Activity, Term, Instructor) %>%
         filter(Activity == activity_filter) %>% 
         filter(!grepl(term_filter, Term)) %>% 
