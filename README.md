@@ -3,7 +3,7 @@
 
 **To run:**
 1. Open "scraper.r", navigate to working directory
-2. Run entire file once in terminal, open "UBCCompleteCourseData.csv" for result
+2. Run entire file once in terminal, open "UBCCompleteCourseData.xlsx" for result
 
 **To adjust filters**
 1. Open "get_root_urls" method and adjust parameter in call to "make_faculty_filter".

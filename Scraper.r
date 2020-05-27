@@ -1,11 +1,13 @@
 #PACKAGE INSTALLATION
     #install.packages("tidyverse")
     #install.packages("rvest")
+    #install.packages("xlsx")
 
 #PACKAGE LOAD
     library(tidyverse)
     library(rvest)
     library(curl)
+    library(xlsx)
 
 #CONSTANTS
 
@@ -205,17 +207,17 @@ clean_information <- function(courseinfo){
 
     #Type between "" with regular expressions
 
-    activity_filter <- "Lecture"
-    term_filter <- "2" 
+    activity_filter <- 'Web-Oriented Course'
+    term_filter <- '2' 
     instructor_filter <- "." #Any part of instructor name
 
-    cleaned_table <- filter(courseinfo, !grepl('Instructor', Instructor)) %>%
+    cleaned_table <- filter(courseinfo, grepl('Instructor', Instructor)) %>%
         separate(Instructor, c("Trim", "Instructor"), sep = ": ") %>%
-        separate(Section, c("Course Code", "Course Number", "Section"), sep = " ") %>%
-        select(Section, Activity, Term, Instructor) %>%
-        filter(Activity == activity_filter) %>% 
-        filter(!grepl(term_filter, Term)) %>% 
-        filter(!grepl(instructor_filter, Instructor))
+        separate(Section, c("Course_Code", "Course_Number", "Section"), sep = " ") %>%
+        select(Course_Code, Course_Number, Section, Activity, Term, Instructor) %>%
+        filter(grepl(activity_filter, Activity)) %>% 
+        filter(grepl(term_filter, Term)) %>% 
+        filter(grepl(instructor_filter, Instructor))
     
     return(cleaned_table)
 }
@@ -229,14 +231,17 @@ main <- function(root){
 
     print(course_information)
 
-    write.csv(course_information, "UBCCompleteCourseData.csv")
+    dest_file <- "UBCCompleteCourseData.xlsx"
 
-    
+    write.xlsx(course_information, dest_file, sheetName = "Sheet1", 
+        col.names = TRUE, row.names = TRUE, append = FALSE)
+
     return(course_information)
 }
 
 #PROGRAM CALL
-main(root_url)
+result <- main(root_url)
+result
 
 #TESTS
     #test_root_urls <- get_root_urls(root_url)
@@ -249,13 +254,15 @@ main(root_url)
     #print(test_get_course_section_information)
 
     #Save full dataframe
-    #course_code_urls <- get_root_urls(root_url)
+    course_code_urls <- get_root_urls(root_url)
     #course_code_urls
-    #course_urls <- get_course_urls(course_code_urls)
+    course_urls <- get_course_urls(course_code_urls)
     #course_urls
-    #section_urls <- get_section_urls(course_urls)
-    #course_information <- get_course_section_information(course_urls)
-    #cleaned_information <- clean_information(course_information)
+    section_urls <- get_section_urls(course_urls)
+    course_information <- get_course_section_information(course_urls)
+    cleaned_information <- clean_information(course_information)
+    write.xlsx(cleaned_information, "UBCCompleteCourseData.xlsx", sheetName = "Sheet1", 
+        col.names = TRUE, row.names = TRUE, append = FALSE)
     #Export full dataframe into csv
     #write.csv(course_information, "UBCCompleteCourseData.csv")
     #course_information
